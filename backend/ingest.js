@@ -6,6 +6,17 @@ await mongoose.connect(process.env.MONGODB_URI);
 
 const tenantUid = typeof process.getuid === "function" ? process.getuid() : 1000;
 
+function getServiceName() {
+    const arg = process.argv.find((item) => item.startsWith("--service="));
+    const fromArg = arg ? arg.split("=")[1]?.trim() : "";
+    const fromEnv = process.env.SERVICE_NAME?.trim() ?? "";
+    return fromArg || fromEnv || "unknown-service";
+}
+
+const serviceName = getServiceName();
+
+console.log(`Ingestor started for service: ${serviceName}`);
+
 
 const BATCH_SIZE = 100;
 
@@ -34,7 +45,7 @@ process.stdin.on("data", async (chunk)=>{
                 tenantUid,
                 level: level,
                 message: msg,
-                service: "demo-service"
+                service: serviceName
             });
             if(buffer.length === BATCH_SIZE){
                 await Log.insertMany(buffer);
