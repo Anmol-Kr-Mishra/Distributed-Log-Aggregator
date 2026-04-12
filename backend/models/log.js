@@ -23,9 +23,13 @@ const logSchema = new mongoose.Schema({
         type: String,
         required: true
     }
+}, {
+    versionKey: false
 });
 
 logSchema.index({tenantUid : 1, timestamp : -1});
 logSchema.index({tenantUid : 1, level: 1});
+logSchema.index({tenantUid : 1, level: 1, timestamp : -1});
+logSchema.index({tenantUid : 1, service: 1, timestamp : -1});
 
 export const Log = mongoose.model("Log", logSchema);
